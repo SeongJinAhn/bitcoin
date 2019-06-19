@@ -1,6 +1,6 @@
 const WebSockets = require("ws"),
   BlockChain = require('./blockchain');
-const {getLastBlock} = BlockChain;
+const {getNewestBlock, isBlockStructureValid, replaceChain} = BlockChain;
 const sockets = [];
 const getSockets = () => sockets;
 
@@ -55,10 +55,35 @@ const parseData = data => {
   }
 }
 
+
 //ws에서 문자열로 보내야 JSON으로 간다.
 const sendMessage = (ws, message) => {
   ws.send(JSON.stringify(message));
 }
+
+const handleBlockchainResponse = receivedBlocks => {
+  if (receivedBlocks.length === 0) {
+    console.log("Received blocks have a length of 0");
+    return;
+  }
+  const latestBlockReceived = receivedBlocks[receivedBlocks.length - 1];
+  if (!isBlockStructureValid(latestBlockReceived)) {
+    console.log("The block structure of the block received is not valid");
+    return;
+  }
+  const newestBlock = getNewestBlock();
+  if (latestBlockReceived.index > newestBlock.index) {
+    if (newestBlock.hash === latestBlockReceived.previousHash) {
+      if (addBlockToChain(latestBlockReceived)) {
+        broadcastNewBlock();
+      }
+    } else if (receivedBlocks.length === 1) {
+      sendMessageToAll(getAll());
+    } else {
+      replaceChain(receivedBlocks);
+    }
+  }
+};
 
 const handleSocketMessage = ws => {
   ws.on('message', data=>{
@@ -72,6 +97,16 @@ const handleSocketMessage = ws => {
       case GET_LATEST:  //마지막 블록을 나타내라는 명령어이므로 getLastBlock()을 전송
         console.log(JSON.stringify(getLastBlock()));  //우리 정보를 출력
         sendMessage(ws,getLastBlock());               //ws의 반대쪽에 우리정보를 전송
+        break;
+      case GET_ALL:
+        sendMessage(ws, responseAll());
+        break;
+      case BLOCKCHAIN_RESPONSE:
+        const receivedBlocks = message.data;
+        if (receivedBlocks === null) {
+          break;
+        }
+        handleBlockchainResponse(receivedBlocks);
         break;
     }
   });
