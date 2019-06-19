@@ -85,6 +85,16 @@ const handleBlockchainResponse = receivedBlocks => {
   }
 };
 
+const handleSocketError = ws => {
+  const closeSocketConnection = ws => {
+      ws.close();
+      sockets.splice(sockets.indexOf(ws),1);
+  }
+  ws.on("close",()=>closeSocketConnection(ws));
+  ws.on("error",()=>closeSocketConnection(ws));
+};
+
+
 const handleSocketMessage = ws => {
   ws.on('message', data=>{
     const message = parseData(data);
@@ -112,14 +122,6 @@ const handleSocketMessage = ws => {
   });
 };
 
-const handleSocketError = ws => {
-    const closeSocketConnection = ws => {
-        ws.close();
-        sockets.splice(sockets.indexOf(ws),1);
-    }
-    ws.on("close",()=>closeSocketConnection(ws));
-    ws.on("error",()=>closeSocketConnection(ws));
-};
 
 const connectToPeers = newPeer => {
   console.log(newPeer);
