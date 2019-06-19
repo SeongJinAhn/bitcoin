@@ -94,7 +94,7 @@ const handleSocketError = ws => {
   ws.on("error",()=>closeSocketConnection(ws));
 };
 
-
+const a=1;
 const handleSocketMessage = ws => {
   ws.on('message', data=>{
     const message = parseData(data);
