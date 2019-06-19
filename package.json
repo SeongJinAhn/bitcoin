@@ -1,0 +1,20 @@
+{
+  "name": "bitcoin",
+  "version": "1.0.0",
+  "description": "bitcoin 1.0 Node.js",
+  "main": "src/server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeongJinAhn/bitcoin.git"
+  },
+  "author": "Seongjin Ahn",
+  "license": "MIT",
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/SeongJinAhn/bitcoin/issues"
+  },
+  "homepage": "https://github.com/SeongJinAhn/bitcoin#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
